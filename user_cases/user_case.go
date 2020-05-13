@@ -1,22 +1,29 @@
 package user_cases
 
-type Services interface {
+type Image struct {
+	Id     string `json:"id"`
+	Height int    `json:"height"`
+	Width  int    `json:"width"`
+	Buffer []byte `json:"buffer"`
+}
+
+type IService interface {
 	Resize(image Image) error
 	AddImage(image Image) error
 	GetImages() ([]Image, error)
 }
 
-type S struct {
+type Service struct {
 }
 
-func (s S) Resize(image Image) error {
+func (service Service) Resize(image Image) error {
 	return nil
 }
 
-func (s S) AddImage(image Image) error {
+func (service Service) AddImage(image Image) error {
 	return nil
 }
 
-func (s S) GetImages() ([]Image, error) {
+func (service Service) GetImages() ([]Image, error) {
 	return nil, nil
 }

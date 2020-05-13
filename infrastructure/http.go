@@ -2,27 +2,44 @@ package infrastructure
 
 import (
 	"encoding/json"
-	"errors"
-	"github.com/gorilla/mux"
+	_ "github.com/facebookgo/inject"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"projectServis/user_cases"
+	_ "projectServis/user_cases"
 )
+
+type ServConn struct {
+	image   *user_cases.Image   `inject:""`
+	service *user_cases.Service `inject:""`
+}
+
+func New(image *user_cases.Image) *ServConn {
+	return &ServConn{
+		image: image,
+	}
+}
+
+//var conn ServConn
 
 func HandleResizeImage(w http.ResponseWriter, r *http.Request) {
 
 	//считываем весь реквест в body
 	body, err := ioutil.ReadAll(r.Body)
 	defer r.Body.Close()
+	if err != nil {
+		panic(err)
+	}
 
 	//создаем структуру
-	image := &Image{}
+	image := &user_cases.Image{}
 
 	//парсим json в эту структуру
 	err = json.Unmarshal(body, image)
 
 	//формируем ответ передаем в метод структуру и возвращаем ошибку
-	err = Resize(*image)
+	err = conn.service.Resize(*image)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte(err.Error()))
@@ -31,57 +48,22 @@ func HandleResizeImage(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
+	// отправляем статус 200
+	//сделать: завернуть картинку и отправить...
 	w.WriteHeader(http.StatusOK)
 }
 
-func Resize(image Image) error {
-
-	if image.Id == "" || image.Height == 0 || image.Width == 0 || len(image.Buffer) == 0 {
-		return errors.New("error: data is not correct")
-	}
-	return nil
-}
-
 // выводит весь массив картинок на экран
+//возвращать массив картинок и ошибку....
 func GetImages(w http.ResponseWriter, r *http.Request) {
-
-	json.NewEncoder(w).Encode(&images)
+	conn.service.GetImages()
 }
 
+//поиск картинки по id
 func GetImageId(w http.ResponseWriter, r *http.Request) {
-
-	params := mux.Vars(r)
-	for _, item := range images {
-		if item.Id == params["id"] {
-			json.NewEncoder(w).Encode(item)
-			return
-		}
-	}
-	json.NewEncoder(w).Encode(&Image{})
-}
-
-func AddImage(image Image) {
-
-	//рандомим id картинки
-	//image.Id = rand.Intn(10000)
-
-	//добавляем картинку в массив картинок
-	images = append(images, image)
+	conn.service.GetImages()
 }
 
 func UpdateImage(w http.ResponseWriter, r *http.Request) {
 
-	params := mux.Vars(r)
-	for index, item := range images {
-		if item.Id == params["id"] {
-			images = append(images[:index], images[index+1:]...)
-			var image Image
-			_ = json.NewDecoder(r.Body).Decode(&image)
-			image.Id = params["id"]
-			images = append(images, image)
-			json.NewEncoder(w).Encode(image)
-			return
-		}
-	}
-	json.NewEncoder(w).Encode(images)
 }
