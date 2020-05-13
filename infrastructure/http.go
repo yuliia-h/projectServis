@@ -21,7 +21,7 @@ func New(image *user_cases.Image) *ServConn {
 	}
 }
 
-//var conn ServConn
+var conn ServConn
 
 func HandleResizeImage(w http.ResponseWriter, r *http.Request) {
 
