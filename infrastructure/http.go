@@ -2,28 +2,24 @@ package infrastructure
 
 import (
 	"encoding/json"
-	_ "github.com/facebookgo/inject"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"projectServis/user_cases"
-	_ "projectServis/user_cases"
 )
 
-type ServConn struct {
-	image   *user_cases.Image   `inject:""`
-	service *user_cases.Service `inject:""`
+//интерфейсный тип
+type Handlers struct {
+	hadnlfield user_cases.Servicer
 }
 
-func New(image *user_cases.Image) *ServConn {
-	return &ServConn{
-		image: image,
+//конструктор
+func NewHandlers(service user_cases.Servicer) *Handlers {
+	return &Handlers{
+		hadnlfield: service,
 	}
 }
-
-var conn ServConn
-
-func HandleResizeImage(w http.ResponseWriter, r *http.Request) {
+func (handler Handlers) HandleResizeImage(w http.ResponseWriter, r *http.Request) {
 
 	//считываем весь реквест в body
 	body, err := ioutil.ReadAll(r.Body)
@@ -39,7 +35,7 @@ func HandleResizeImage(w http.ResponseWriter, r *http.Request) {
 	err = json.Unmarshal(body, image)
 
 	//формируем ответ передаем в метод структуру и возвращаем ошибку
-	err = conn.service.Resize(*image)
+	err = handler.hadnlfield.Resize(*image)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		_, err := w.Write([]byte(err.Error()))
@@ -54,16 +50,17 @@ func HandleResizeImage(w http.ResponseWriter, r *http.Request) {
 }
 
 // выводит весь массив картинок на экран
-//возвращать массив картинок и ошибку....
-func GetImages(w http.ResponseWriter, r *http.Request) {
-	conn.service.GetImages()
+//сделать: возвращать массив картинок и ошибку....
+func (handler Handlers) GetImages(w http.ResponseWriter, r *http.Request) {
+
 }
 
 //поиск картинки по id
-func GetImageId(w http.ResponseWriter, r *http.Request) {
-	conn.service.GetImages()
+func (handler Handlers) GetImageId(w http.ResponseWriter, r *http.Request) {
+
 }
 
-func UpdateImage(w http.ResponseWriter, r *http.Request) {
+//обновление картинки
+func (handler Handlers) UpdateImage(w http.ResponseWriter, r *http.Request) {
 
 }

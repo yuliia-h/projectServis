@@ -7,13 +7,20 @@ type Image struct {
 	Buffer []byte `json:"buffer"`
 }
 
-type IService interface {
+//------------Servicer------------------
+type Servicer interface {
 	Resize(image Image) error
 	AddImage(image Image) error
 	GetImages() ([]Image, error)
 }
 
+func NewResizeImager() *Service {
+	return nil
+}
+
 type Service struct {
+	repository RepositoryImages
+	library    LibraryImages
 }
 
 func (service Service) Resize(image Image) error {

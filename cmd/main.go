@@ -1,20 +1,37 @@
+//Задание:
+//Реализовать сервис, который позволяет
+//- изменять размер картинок
+//- запросить историю по измененным картинкам
+//- запросить данные картинки по id
+//- изменить данные картинки по id
+
 package main
 
 import (
 	"fmt"
 	"net/http"
 	"projectServis/infrastructure"
+	"projectServis/user_cases"
 )
 
 func main() {
 
-	http.HandleFunc("/struct/", infrastructure.HandleResizeImage)
+	// инициализация переменной
+	resizeImager := user_cases.NewResizeImager()
 
-	http.HandleFunc("/getimageId/{id}/", infrastructure.GetImageId)
+	handlers := infrastructure.NewHandlers(resizeImager)
 
-	http.HandleFunc("/getimages/", infrastructure.GetImages)
+	// получение картинки
+	http.HandleFunc("/struct/", handlers.HandleResizeImage)
 
-	http.HandleFunc("/updateimage/{id}/", infrastructure.UpdateImage)
+	// выдача картинки по id
+	http.HandleFunc("/getimageId/{id}/", handlers.GetImageId)
+
+	// выдача всех картинок
+	http.HandleFunc("/getimages/", handlers.GetImages)
+
+	// обновить данные картинки по id
+	http.HandleFunc("/updateimage/{id}/", handlers.UpdateImage)
 
 	//for check THEN: delete
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
