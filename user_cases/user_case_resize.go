@@ -14,6 +14,23 @@ import (
 )
 
 //-----------Library-----------------------------------------
+
+//интерфейсный тип
+type Libraryes struct {
+	libraryfield LibraryImager
+}
+
+//конструктор
+func NewLibraryes(library LibraryImager) *Libraryes {
+	return &Libraryes{
+		libraryfield: library,
+	}
+}
+
+func NewLibraryImages() *LibraryImages {
+	return nil
+}
+
 type LibraryImager interface {
 	ResizeImageLibrary(image Image) error
 }

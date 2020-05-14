@@ -21,16 +21,16 @@ func main() {
 
 	handlers := infrastructure.NewHandlers(resizeImager)
 
-	// получение картинки
+	// изменить размер картинки
 	http.HandleFunc("/struct/", handlers.HandleResizeImage)
 
-	// выдача картинки по id
-	http.HandleFunc("/getimageId/{id}/", handlers.GetImageId)
+	// история по измененным картинкам
+	http.HandleFunc("/historyimages/", handlers.HistoryImages)
 
-	// выдача всех картинок
-	http.HandleFunc("/getimages/", handlers.GetImages)
+	// данные картинки по id
+	http.HandleFunc("/getimage/{id}/", handlers.GetImageId)
 
-	// обновить данные картинки по id
+	// изменить данные картинки по id
 	http.HandleFunc("/updateimage/{id}/", handlers.UpdateImage)
 
 	//for check THEN: delete

@@ -10,8 +10,9 @@ type Image struct {
 //------------Servicer------------------
 type Servicer interface {
 	Resize(image Image) error
-	AddImage(image Image) error
-	GetImages() ([]Image, error)
+	History(image Image) error
+	GetId(image Image) error
+	UpdateId(image Image) error
 }
 
 func NewResizeImager() *Service {
@@ -23,14 +24,26 @@ type Service struct {
 	library    LibraryImages
 }
 
+// изменить размер
 func (service Service) Resize(image Image) error {
+	service.library.ResizeImageLibrary(image)
 	return nil
 }
 
-func (service Service) AddImage(image Image) error {
+// история по измененным картинкам
+func (service Service) History(image Image) error {
+	service.repository.HistoryImages(image)
 	return nil
 }
 
-func (service Service) GetImages() ([]Image, error) {
-	return nil, nil
+// данные картинки по id
+func (service Service) GetId(image Image) error {
+	service.repository.FindImageId(image)
+	return nil
+}
+
+// изменить данные картинки по id
+func (service Service) UpdateId(image Image) error {
+	service.repository.ChangeImageId(image)
+	return nil
 }
