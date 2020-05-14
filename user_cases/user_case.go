@@ -1,5 +1,7 @@
 package user_cases
 
+import "errors"
+
 type Image struct {
 	Id     string `json:"id"`
 	Height int    `json:"height"`
@@ -26,6 +28,11 @@ type Service struct {
 
 // изменить размер
 func (service Service) Resize(image Image) error {
+
+	if image.Id == "" {
+		return errors.New("ot completed id")
+	}
+
 	service.library.ResizeImageLibrary(image)
 	return nil
 }

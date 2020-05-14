@@ -2,22 +2,6 @@ package user_cases
 
 //------------Repository----------------------------------
 
-//интерфейсный тип
-type Repositories struct {
-	repositorfield RepositoryImager
-}
-
-//конструктор
-func NewRepositories(repo RepositoryImager) *Repositories {
-	return &Repositories{
-		repositorfield: repo,
-	}
-}
-
-func NewRepositorImages() *RepositoryImages {
-	return nil
-}
-
 type RepositoryImager interface {
 	HistoryImages(image Image) error
 	FindImageId(image Image) error
