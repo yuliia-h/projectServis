@@ -1,23 +1,18 @@
-package user_cases
+package interfaces
 
 import (
 	"fmt"
-	"github.com/disintegration/imaging"
-	"github.com/nfnt/resize"
-	"github.com/noelyahan/impexp"
-	"github.com/noelyahan/mergi"
 	"image"
 	"image/color"
 	"image/jpeg"
 	"log"
 	"os"
+
+	"github.com/disintegration/imaging"
+	"github.com/nfnt/resize"
+	"github.com/noelyahan/impexp"
+	"github.com/noelyahan/mergi"
 )
-
-//-----------Library-----------------------------------------
-
-type LibraryImager interface {
-	ResizeImageLibrary(image Image) error
-}
 
 type LibraryImages struct {
 }

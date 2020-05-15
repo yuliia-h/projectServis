@@ -1,20 +1,31 @@
 package user_cases
 
-import "errors"
-
 type Image struct {
-	Id     string `json:"id"`
-	Height int    `json:"height"`
-	Width  int    `json:"width"`
-	Buffer []byte `json:"buffer"`
+	Id     string
+	Height int
+	Width  int
+	Buffer []byte
+}
+
+//------------Repository----------------------------------
+type RepositoryImager interface {
+	HistoryImages() (Image, error)
+	FindImageId(str string) (Image, error)
+	ChangeImageId(image Image) error
+	SaveImage(image Image) error
+}
+
+//------------Library----------------------------------
+type LibraryImager interface {
+	ResizeImageLibrary(image Image) error
 }
 
 //------------Servicer------------------
 type Servicer interface {
-	Resize(image Image) error
-	History(image Image) error
-	GetId(image Image) error
-	UpdateId(image Image) error
+	Resize(image Image) (Image, error)
+	History() (Image, error)
+	GetDataById(string) (Image, error)
+	UpdateDataById(string) (Image, error)
 }
 
 func NewResizeImager() *Service {
@@ -22,35 +33,27 @@ func NewResizeImager() *Service {
 }
 
 type Service struct {
-	repository RepositoryImages
-	library    LibraryImages
+	repository RepositoryImager
+	library    LibraryImager
 }
 
 // изменить размер
-func (service Service) Resize(image Image) error {
-
-	if image.Id == "" {
-		return errors.New("ot completed id")
-	}
-
+func (service Service) Resize(image Image) (Image, error) {
 	service.library.ResizeImageLibrary(image)
-	return nil
+	return image, nil
 }
 
 // история по измененным картинкам
-func (service Service) History(image Image) error {
-	service.repository.HistoryImages(image)
-	return nil
+func (service Service) History() (Image, error) {
+	return service.repository.HistoryImages()
 }
 
 // данные картинки по id
-func (service Service) GetId(image Image) error {
-	service.repository.FindImageId(image)
-	return nil
+func (service Service) GetDataById(id string) (Image, error) {
+	return service.repository.FindImageId(id)
 }
 
 // изменить данные картинки по id
-func (service Service) UpdateId(image Image) error {
-	service.repository.ChangeImageId(image)
-	return nil
+func (service Service) UpdateDataById(id string) (Image, error) {
+	return service.repository.ChangeImageId(id)
 }
