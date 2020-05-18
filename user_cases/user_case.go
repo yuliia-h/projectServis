@@ -2,58 +2,53 @@ package user_cases
 
 type Image struct {
 	Id     string
-	Height int
 	Width  int
-	Buffer []byte
-}
-
-//------------Repository----------------------------------
-type RepositoryImager interface {
-	HistoryImages() (Image, error)
-	FindImageId(str string) (Image, error)
-	ChangeImageId(image Image) error
-	SaveImage(image Image) error
-}
-
-//------------Library----------------------------------
-type LibraryImager interface {
-	ResizeImageLibrary(image Image) error
-}
-
-//------------Servicer------------------
-type Servicer interface {
-	Resize(image Image) (Image, error)
-	History() (Image, error)
-	GetDataById(string) (Image, error)
-	UpdateDataById(string) (Image, error)
-}
-
-func NewResizeImager() *Service {
-	return nil
+	Height int
+	Buffer string
 }
 
 type Service struct {
-	repository RepositoryImager
 	library    LibraryImager
+	repository RepositoryImager
 }
 
-// изменить размер
-func (service Service) Resize(image Image) (Image, error) {
-	service.library.ResizeImageLibrary(image)
-	return image, nil
+func NewService(lib LibraryImager, repo RepositoryImager) *Service {
+	return &Service{
+		library:    lib,
+		repository: repo,
+	}
 }
 
-// история по измененным картинкам
-func (service Service) History() (Image, error) {
-	return service.repository.HistoryImages()
+type Servicer interface {
+	Resize(image Image) (Image, error)
+	History() ([]Image, error)
+	GetDataById(id string) (Image, error)
+	UpdateDataById(id string) (Image, error)
 }
 
-// данные картинки по id
-func (service Service) GetDataById(id string) (Image, error) {
-	return service.repository.FindImageId(id)
+func (s Service) Resize(image Image) (Image, error) {
+	return s.library.ResizeImageLibrary(image)
 }
 
-// изменить данные картинки по id
-func (service Service) UpdateDataById(id string) (Image, error) {
-	return service.repository.ChangeImageId(id)
+func (s Service) History() ([]Image, error) {
+	return s.repository.HistoryImages()
+}
+
+func (s Service) GetDataById(id string) (Image, error) {
+	return s.repository.FindImageId(id)
+}
+
+func (s Service) UpdateDataById(id string) (Image, error) {
+	return s.repository.ChangeImageId(id)
+}
+
+type LibraryImager interface {
+	ResizeImageLibrary(image Image) (Image, error)
+}
+
+type RepositoryImager interface {
+	HistoryImages() ([]Image, error)
+	FindImageId(id string) (Image, error)
+	ChangeImageId(id string) (Image, error)
+	SaveImage(image Image) error
 }
