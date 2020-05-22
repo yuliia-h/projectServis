@@ -3,6 +3,7 @@ package interfaces
 import (
 	"bytes"
 	"encoding/base64"
+	"errors"
 	"image"
 	"projectServis/user_cases"
 
@@ -12,7 +13,7 @@ import (
 type LibraryImages struct {
 	DecodeString   func(string) ([]byte, error)
 	Decode         func([]byte) (image.Image, error)
-	Resize         func(image.Image) image.Image
+	Resize         func(image.Image) *image.NRGBA
 	Encode         func(*bytes.Buffer, image.Image, imaging.Format) error
 	EncodeToString func(src []byte) string
 	SomeImage      func(i interface{}) image.Image
@@ -26,7 +27,7 @@ func NewLibraryImages() *LibraryImages {
 		Decode: func(s []byte) (image.Image, error) {
 			return imaging.Decode(bytes.NewReader(s))
 		},
-		Resize: func(img image.Image) image.Image {
+		Resize: func(img image.Image) *image.NRGBA {
 			return imaging.Resize(img, 100, 0, imaging.Lanczos)
 		},
 		Encode: func(s *bytes.Buffer, img image.Image, format imaging.Format) error {
@@ -34,13 +35,6 @@ func NewLibraryImages() *LibraryImages {
 		},
 		EncodeToString: func(src []byte) string {
 			return base64.StdEncoding.EncodeToString(src)
-		},
-		SomeImage: func(i interface{}) image.Image {
-			img, ok := i.(image.Image)
-			if ok {
-				return img
-			}
-			return nil
 		},
 	}
 }
@@ -60,9 +54,11 @@ func (l LibraryImages) ResizeImageLibrary(image user_cases.Image) (user_cases.Im
 		return user_cases.Image{}, err
 	}
 
-	//im2 := l.SomeImage(im)
-
 	var src = l.Resize(im)
+
+	if src == nil {
+		return user_cases.Image{}, errors.New("image is empty")
+	}
 
 	var buff bytes.Buffer
 	err = l.Encode(&buff, src, imaging.PNG)
@@ -71,6 +67,9 @@ func (l LibraryImages) ResizeImageLibrary(image user_cases.Image) (user_cases.Im
 	}
 
 	image.Buffer = l.EncodeToString(buff.Bytes())
+	if image.Buffer == "" {
+		return user_cases.Image{}, errors.New("encodeToString error")
+	}
 
 	return image, nil
 }

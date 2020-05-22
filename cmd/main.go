@@ -9,6 +9,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/jmoiron/sqlx"
 	"net/http"
 	"projectServis/infrastructure"
 	"projectServis/interfaces"
@@ -19,9 +20,18 @@ func main() {
 
 	// инициализация переменной
 
+	connStr := "user=postgres password=ihavetoget5588 dbname=ImagesDB sslmode=disable"
+	db, err := sqlx.Open("postgres", connStr)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	dbimage := infrastructure.NewDbimageConnect(db)
+
 	libImage := interfaces.NewLibraryImages()
 
-	repoImage := interfaces.NewRepositoryImages()
+	repoImage := interfaces.NewRepositoryImages(dbimage)
 
 	resizeImager := user_cases.NewService(libImage, repoImage)
 

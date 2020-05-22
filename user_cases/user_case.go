@@ -1,7 +1,9 @@
 package user_cases
 
+import "log"
+
 type Image struct {
-	Id     string
+	Id     int
 	Width  int
 	Height int
 	Buffer string
@@ -22,23 +24,33 @@ func NewService(lib LibraryImager, repo RepositoryImager) *Service {
 type Servicer interface {
 	Resize(image Image) (Image, error)
 	History() ([]Image, error)
-	GetDataById(id string) (Image, error)
-	UpdateDataById(id string) (Image, error)
+	GetDataById(id int) (Image, error)
+	UpdateDataById(id int) (Image, error)
 }
 
 func (s Service) Resize(image Image) (Image, error) {
-	return s.library.ResizeImageLibrary(image)
+	image, err := s.library.ResizeImageLibrary(image)
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = s.repository.SaveImage(image)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return image, err
 }
 
 func (s Service) History() ([]Image, error) {
 	return s.repository.HistoryImages()
 }
 
-func (s Service) GetDataById(id string) (Image, error) {
+func (s Service) GetDataById(id int) (Image, error) {
 	return s.repository.FindImageId(id)
 }
 
-func (s Service) UpdateDataById(id string) (Image, error) {
+func (s Service) UpdateDataById(id int) (Image, error) {
 	return s.repository.ChangeImageId(id)
 }
 
@@ -48,7 +60,7 @@ type LibraryImager interface {
 
 type RepositoryImager interface {
 	HistoryImages() ([]Image, error)
-	FindImageId(id string) (Image, error)
-	ChangeImageId(id string) (Image, error)
+	FindImageId(id int) (Image, error)
+	ChangeImageId(id int) (Image, error)
 	SaveImage(image Image) error
 }

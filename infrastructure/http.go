@@ -21,7 +21,7 @@ func NewHandlers(service user_cases.Servicer) *Handlers {
 }
 
 type Image struct {
-	Id     string `json:"id"`
+	Id     int    `json:"id"`
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
 	Buffer string `json:"buffer"`
