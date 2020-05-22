@@ -20,7 +20,7 @@ func main() {
 
 	// инициализация переменной
 
-	connStr := "user=postgres password=ihavetoget5588 dbname=ImagesDB sslmode=disable"
+	connStr := "user=postgres password=ihavetoget5588 dbname=postgres sslmode=disable"
 	db, err := sqlx.Open("postgres", connStr)
 	if err != nil {
 		panic(err)

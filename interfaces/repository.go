@@ -1,9 +1,7 @@
 package interfaces
 
 import (
-	"crypto/rand"
 	"log"
-	"os"
 	"projectServis/user_cases"
 )
 
@@ -26,10 +24,12 @@ func NewRepositoryImages(db Dbmager) *RepositoryImages {
 func (r RepositoryImages) HistoryImages() ([]user_cases.Image, error) {
 
 	i := []user_cases.Image{}
+
 	return i, nil
 }
 
 func (r RepositoryImages) FindImageId(s int) (user_cases.Image, error) {
+
 	i := user_cases.Image{}
 	return i, nil
 }
@@ -39,35 +39,18 @@ func (r RepositoryImages) ChangeImageId(s int) (user_cases.Image, error) {
 	return i, nil
 }
 
-func (r RepositoryImages) SaveImage(image user_cases.Image) error {
+func (r RepositoryImages) SaveImage(image user_cases.ImageDb) (user_cases.ImageDb, error) {
 
-	img := Image{}
-	namefile, _ := randomfilename16char()
-	f, err := os.Create("image" + namefile + ".png")
+	image, err := r.db.SaveImage(image)
 	if err != nil {
 		log.Println(err)
 	}
-	fileurl := "C:\\Users\\user\\go\\src\\projectServis\\repository\\" + f.Name()
-	img.Link = fileurl
-	err = r.db.SaveImage(img)
-	if err != nil {
-		log.Println(err)
-	}
-	return err
-}
-
-func randomfilename16char() (s string, err error) {
-	b := make([]byte, 8)
-	_, err = rand.Read(b)
-	if err != nil {
-		return
-	}
-	return s, err
+	return image, err
 }
 
 type Dbmager interface {
 	HistoryAll() ([]Image, error)
 	FindImageId(id int) Image
 	ChangeImageId(id int)
-	SaveImage(image Image) error
+	SaveImage(image user_cases.ImageDb) (user_cases.ImageDb, error)
 }
