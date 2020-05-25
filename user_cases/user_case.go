@@ -3,21 +3,14 @@ package user_cases
 import (
 	"log"
 	"math/rand"
+	"projectServis/interfaces"
 	"time"
 )
 
 type Image struct {
-	Id     int
 	Width  int
 	Height int
 	Buffer string
-}
-
-type ImageDb struct {
-	Id     int    `db:" Id "`
-	Width  int    `db:" Width "`
-	Height int    `db:" Height "`
-	Link   string `db:" Link "`
 }
 
 //random numbers
@@ -53,34 +46,37 @@ func NewService(lib LibraryImager, repo RepositoryImager) *Service {
 }
 
 type Servicer interface {
-	Resize(image Image) (ImageDb, error)
-	History() ([]Image, error)
-	GetDataById(id int) (Image, error)
+	Resize(image Image) (interfaces.ImageLink, error)
+	History() ([]interfaces.ImageLink, error)
+	GetDataById(id int) (interfaces.ImageLink, error)
 	UpdateDataById(id int) (Image, error)
 }
 
-func (s Service) Resize(image Image) (ImageDb, error) {
+func (s Service) Resize(image Image) (interfaces.ImageLink, error) {
 
-	image, err := s.library.ResizeImageLibrary(image)
+	resizedImg, err := s.library.ResizeImageLibrary(image)
 	if err != nil {
 		log.Println(err)
 	}
-	imDb := ImageDb{}
-	imDb.Width = image.Width
-	imDb.Height = image.Height
-	imDb.Link = String(30)
-	imDb, err = s.repository.SaveImage(imDb)
-	if err != nil {
-		log.Println(err)
+	imDb := interfaces.ImageDb{
+		Width:  resizedImg.Width,
+		Height: resizedImg.Height,
+		Link:   String(30),
 	}
-	return imDb, err
+
+	imgInfo, err := s.repository.SaveImage(imDb)
+	if err != nil {
+	}
+	imgInfo.Buffer = resizedImg.Buffer
+
+	return imgInfo, err
 }
 
-func (s Service) History() ([]Image, error) {
+func (s Service) History() ([]interfaces.ImageLink, error) {
 	return s.repository.HistoryImages()
 }
 
-func (s Service) GetDataById(id int) (Image, error) {
+func (s Service) GetDataById(id int) (interfaces.ImageLink, error) {
 	return s.repository.FindImageId(id)
 }
 
@@ -93,8 +89,8 @@ type LibraryImager interface {
 }
 
 type RepositoryImager interface {
-	HistoryImages() ([]Image, error)
-	FindImageId(id int) (Image, error)
+	HistoryImages() ([]interfaces.ImageLink, error)
+	FindImageId(id int) (interfaces.ImageLink, error)
 	ChangeImageId(id int) (Image, error)
-	SaveImage(image ImageDb) (ImageDb, error)
+	SaveImage(interfaces.ImageDb) (interfaces.ImageLink, error)
 }

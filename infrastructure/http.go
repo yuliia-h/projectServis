@@ -21,7 +21,6 @@ func NewHandlers(service user_cases.Servicer) *Handlers {
 }
 
 type Image struct {
-	Id     int    `json:"id"`
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
 	Buffer string `json:"buffer"`
@@ -42,6 +41,10 @@ func (h Handlers) HandleResizeImage(w http.ResponseWriter, r *http.Request) {
 
 	//парсим json в эту структуру
 	err = json.Unmarshal(body, &image)
+	if err != nil {
+		log.Println(err)
+	}
+
 	i := user_cases.Image(image)
 
 	//формируем ответ передаем в метод структуру и возвращаем ошибку
@@ -55,6 +58,9 @@ func (h Handlers) HandleResizeImage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	b, err := json.Marshal(ans)
+	if err != nil {
+		log.Println(err)
+	}
 
 	w.Write(b)
 	// отправляем статус 200

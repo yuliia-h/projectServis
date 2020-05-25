@@ -1,36 +1,45 @@
 package interfaces
 
 import (
-	"log"
 	"projectServis/user_cases"
 )
 
-type Image struct {
-	Id   int    `db:" id "`
-	Link string `db:" link "`
+type ImageDb struct {
+	Id     int    `db:" Id "`
+	Width  int    `db:" Width "`
+	Height int    `db:" Height "`
+	Link   string `db:" Link "`
+}
+
+type ImageLink struct {
+	Id     int
+	Width  int
+	Height int
+	Link   string
+	Buffer string
 }
 
 type RepositoryImages struct {
 	//use interface
-	db Dbmager
+	db DbImager
 }
 
-func NewRepositoryImages(db Dbmager) *RepositoryImages {
+func NewRepositoryImages(db DbImager) *RepositoryImages {
 	return &RepositoryImages{
 		db: db,
 	}
 }
 
-func (r RepositoryImages) HistoryImages() ([]user_cases.Image, error) {
+func (r RepositoryImages) HistoryImages() ([]ImageLink, error) {
 
-	i := []user_cases.Image{}
+	i := []ImageLink{}
 
 	return i, nil
 }
 
-func (r RepositoryImages) FindImageId(s int) (user_cases.Image, error) {
+func (r RepositoryImages) FindImageId(s int) (ImageLink, error) {
 
-	i := user_cases.Image{}
+	i := ImageLink{}
 	return i, nil
 }
 
@@ -39,18 +48,23 @@ func (r RepositoryImages) ChangeImageId(s int) (user_cases.Image, error) {
 	return i, nil
 }
 
-func (r RepositoryImages) SaveImage(image user_cases.ImageDb) (user_cases.ImageDb, error) {
+func (r RepositoryImages) SaveImage(image ImageDb) (ImageLink, error) {
 
-	image, err := r.db.SaveImage(image)
-	if err != nil {
-		log.Println(err)
+	imgId, err := r.db.SaveImage(image)
+	imgReturn := ImageLink{
+		Id:     imgId.Id,
+		Width:  imgId.Width,
+		Height: imgId.Height,
+		Link:   imgId.Link,
+		Buffer: "",
 	}
-	return image, err
+
+	return imgReturn, err
 }
 
-type Dbmager interface {
-	HistoryAll() ([]Image, error)
-	FindImageId(id int) Image
+type DbImager interface {
+	HistoryAll() ([]ImageLink, error)
+	FindImageId(id int) ImageLink
 	ChangeImageId(id int)
-	SaveImage(image user_cases.ImageDb) (user_cases.ImageDb, error)
+	SaveImage(image ImageDb) (ImageDb, error)
 }

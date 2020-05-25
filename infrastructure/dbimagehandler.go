@@ -5,7 +5,6 @@ import (
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"projectServis/interfaces"
-	"projectServis/user_cases"
 )
 
 const schema = `CREATE TABLE if not exists images (
@@ -32,27 +31,27 @@ func (r DbimageConnect) MakeUniqueImageQuery() error {
 	return err
 }
 
-func (r DbimageConnect) HistoryAll() ([]interfaces.Image, error) {
-	var images []interfaces.Image
+func (r DbimageConnect) HistoryAll() ([]interfaces.ImageLink, error) {
+	var images []interfaces.ImageDb
 
 	err := r.dbimage.Select(&images, "select * from images")
 
-	usercaseImages := make([]interfaces.Image, 0, len(images))
-	for i := range images {
-		usercaseImages = append(usercaseImages, interfaces.Image{Link: images[i].Link})
-	}
+	usercaseImages := make([]interfaces.ImageLink, 0, len(images))
+	//for i := range images {
+	//	usercaseImages = append(usercaseImages, interfaces.ImageDb{Link: images[i].Link})
+	//}
 	return usercaseImages, err
 }
 
-func (r DbimageConnect) FindImageId(id int) interfaces.Image {
-	temp := interfaces.Image{}
+func (r DbimageConnect) FindImageId(id int) interfaces.ImageLink {
+	temp := interfaces.ImageLink{}
 	return temp
 }
 
 func (r DbimageConnect) ChangeImageId(id int) {
 }
 
-func (r DbimageConnect) SaveImage(image user_cases.ImageDb) (user_cases.ImageDb, error) {
+func (r DbimageConnect) SaveImage(image interfaces.ImageDb) (interfaces.ImageDb, error) {
 
 	//запись данных обычная
 	//_, err := r.dbimage.Exec("INSERT INTO images (width, height, link) VALUES ($1, $2, $3)",
