@@ -11,13 +11,14 @@ type ImageDb struct {
 	Link   string `db:" Link "`
 }
 
-type ImageLink struct {
-	Id     int
-	Width  int
-	Height int
-	Link   string
-	Buffer string
-}
+//
+//type ImageLink struct {
+//	Id     int
+//	Width  int
+//	Height int
+//	Link   string
+//	Buffer string
+//}
 
 type RepositoryImages struct {
 	//use interface
@@ -30,16 +31,16 @@ func NewRepositoryImages(db DbImager) *RepositoryImages {
 	}
 }
 
-func (r RepositoryImages) HistoryImages() ([]ImageLink, error) {
+func (r RepositoryImages) HistoryImages() ([]user_cases.Image, error) {
 
-	i := []ImageLink{}
+	i := []user_cases.Image{}
 
 	return i, nil
 }
 
-func (r RepositoryImages) FindImageId(s int) (ImageLink, error) {
+func (r RepositoryImages) FindImageId(s int) (user_cases.Image, error) {
 
-	i := ImageLink{}
+	i := user_cases.Image{}
 	return i, nil
 }
 
@@ -48,23 +49,27 @@ func (r RepositoryImages) ChangeImageId(s int) (user_cases.Image, error) {
 	return i, nil
 }
 
-func (r RepositoryImages) SaveImage(image ImageDb) (ImageLink, error) {
+func (r RepositoryImages) SaveImage(image user_cases.Image) (user_cases.Image, error) {
 
-	imgId, err := r.db.SaveImage(image)
-	imgReturn := ImageLink{
-		Id:     imgId.Id,
-		Width:  imgId.Width,
-		Height: imgId.Height,
-		Link:   imgId.Link,
-		Buffer: "",
-	}
+	//imgId, err := r.db.SaveImage(image)
+	//imgReturn := ImageDb{
+	//	Id:     imgId.Id,
+	//	Width:  imgId.Width,
+	//	Height: imgId.Height,
+	//	Link:   imgId.Link,
+	//}
+	//imguser := user_cases.Image{
+	//	Width:  imgReturn.Id,
+	//	Height: imgReturn.Width,
+	//	Buffer: imgReturn.Link,
+	//}
 
-	return imgReturn, err
+	return image, nil
 }
 
 type DbImager interface {
-	HistoryAll() ([]ImageLink, error)
-	FindImageId(id int) ImageLink
+	HistoryAll() ([]ImageDb, error)
+	FindImageId(id int) ImageDb
 	ChangeImageId(id int)
-	SaveImage(image ImageDb) (ImageDb, error)
+	SaveImage(ImageDb) (ImageDb, error)
 }

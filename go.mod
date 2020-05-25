@@ -1,4 +1,4 @@
-module imgmod
+module projectServis
 
 go 1.14
 

@@ -31,20 +31,20 @@ func (r DbimageConnect) MakeUniqueImageQuery() error {
 	return err
 }
 
-func (r DbimageConnect) HistoryAll() ([]interfaces.ImageLink, error) {
+func (r DbimageConnect) HistoryAll() ([]interfaces.ImageDb, error) {
 	var images []interfaces.ImageDb
 
 	err := r.dbimage.Select(&images, "select * from images")
 
-	usercaseImages := make([]interfaces.ImageLink, 0, len(images))
+	usercaseImages := make([]interfaces.ImageDb, 0, len(images))
 	//for i := range images {
 	//	usercaseImages = append(usercaseImages, interfaces.ImageDb{Link: images[i].Link})
 	//}
 	return usercaseImages, err
 }
 
-func (r DbimageConnect) FindImageId(id int) interfaces.ImageLink {
-	temp := interfaces.ImageLink{}
+func (r DbimageConnect) FindImageId(id int) interfaces.ImageDb {
+	temp := interfaces.ImageDb{}
 	return temp
 }
 

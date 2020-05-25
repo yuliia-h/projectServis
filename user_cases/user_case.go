@@ -1,9 +1,7 @@
 package user_cases
 
 import (
-	"log"
 	"math/rand"
-	"projectServis/interfaces"
 	"time"
 )
 
@@ -46,37 +44,37 @@ func NewService(lib LibraryImager, repo RepositoryImager) *Service {
 }
 
 type Servicer interface {
-	Resize(image Image) (interfaces.ImageLink, error)
-	History() ([]interfaces.ImageLink, error)
-	GetDataById(id int) (interfaces.ImageLink, error)
+	Resize(image Image) (Image, error)
+	History() ([]Image, error)
+	GetDataById(id int) (Image, error)
 	UpdateDataById(id int) (Image, error)
 }
 
-func (s Service) Resize(image Image) (interfaces.ImageLink, error) {
+func (s Service) Resize(image Image) (Image, error) {
 
-	resizedImg, err := s.library.ResizeImageLibrary(image)
-	if err != nil {
-		log.Println(err)
-	}
-	imDb := interfaces.ImageDb{
-		Width:  resizedImg.Width,
-		Height: resizedImg.Height,
-		Link:   String(30),
-	}
+	//resizedImg, err := s.library.ResizeImageLibrary(image)
+	//if err != nil {
+	//	log.Println(err)
+	//}
+	//imDb := interfaces.ImageDb{
+	//	Width:  resizedImg.Width,
+	//	Height: resizedImg.Height,
+	//	Link:   String(30),
+	//}
+	//
+	//imgInfo, err := s.repository.SaveImage(imDb)
+	//if err != nil {
+	//}
+	//imgInfo.Buffer = resizedImg.Buffer
 
-	imgInfo, err := s.repository.SaveImage(imDb)
-	if err != nil {
-	}
-	imgInfo.Buffer = resizedImg.Buffer
-
-	return imgInfo, err
+	return image, nil
 }
 
-func (s Service) History() ([]interfaces.ImageLink, error) {
+func (s Service) History() ([]Image, error) {
 	return s.repository.HistoryImages()
 }
 
-func (s Service) GetDataById(id int) (interfaces.ImageLink, error) {
+func (s Service) GetDataById(id int) (Image, error) {
 	return s.repository.FindImageId(id)
 }
 
@@ -89,8 +87,8 @@ type LibraryImager interface {
 }
 
 type RepositoryImager interface {
-	HistoryImages() ([]interfaces.ImageLink, error)
-	FindImageId(id int) (interfaces.ImageLink, error)
+	HistoryImages() ([]Image, error)
+	FindImageId(id int) (Image, error)
 	ChangeImageId(id int) (Image, error)
-	SaveImage(interfaces.ImageDb) (interfaces.ImageLink, error)
+	SaveImage(image Image) (Image, error)
 }
