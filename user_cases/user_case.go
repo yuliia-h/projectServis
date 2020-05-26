@@ -1,14 +1,17 @@
 package user_cases
 
 import (
+	"log"
 	"math/rand"
 	"time"
 )
 
 type Image struct {
+	Id     int
 	Width  int
 	Height int
 	Buffer string
+	Link   string
 }
 
 //random numbers
@@ -52,22 +55,19 @@ type Servicer interface {
 
 func (s Service) Resize(image Image) (Image, error) {
 
-	//resizedImg, err := s.library.ResizeImageLibrary(image)
-	//if err != nil {
-	//	log.Println(err)
-	//}
-	//imDb := interfaces.ImageDb{
-	//	Width:  resizedImg.Width,
-	//	Height: resizedImg.Height,
-	//	Link:   String(30),
-	//}
-	//
-	//imgInfo, err := s.repository.SaveImage(imDb)
-	//if err != nil {
-	//}
-	//imgInfo.Buffer = resizedImg.Buffer
+	resizedImg, err := s.library.ResizeImageLibrary(image)
+	if err != nil {
+		log.Println(err)
+	}
+	resizedImg.Link = String(30)
 
-	return image, nil
+	imgInfo, err := s.repository.SaveImage(resizedImg)
+	if err != nil {
+	}
+
+	imgInfo.Buffer = resizedImg.Buffer
+
+	return imgInfo, err
 }
 
 func (s Service) History() ([]Image, error) {
