@@ -1,23 +1,30 @@
 package interfaces
 
 import (
-	"crypto/rand"
-	"log"
-	"os"
 	"projectServis/user_cases"
 )
 
-type Image struct {
-	Id   int    `db:" id "`
-	Link string `db:" link "`
+type ImageDb struct {
+	Id     int    `db:"id"`
+	Width  int    `db:"width"`
+	Height int    `db:"height"`
+	Link   string `db:"link"`
 }
+
+//type ImageLink struct {
+//	Id     int
+//	Width  int
+//	Height int
+//	Link   string
+//	Buffer string
+//}
 
 type RepositoryImages struct {
 	//use interface
-	db Dbmager
+	db DbImager
 }
 
-func NewRepositoryImages(db Dbmager) *RepositoryImages {
+func NewRepositoryImages(db DbImager) *RepositoryImages {
 	return &RepositoryImages{
 		db: db,
 	}
@@ -25,49 +32,80 @@ func NewRepositoryImages(db Dbmager) *RepositoryImages {
 
 func (r RepositoryImages) HistoryImages() ([]user_cases.Image, error) {
 
-	i := []user_cases.Image{}
-	return i, nil
+	img, err := r.db.HistoryAll()
+	var count int = len(img)
+	var imageNew = make([]user_cases.Image, count)
+
+	for i := 0; i < len(imageNew); i++ {
+		imageNew[i].Id = img[i].Id
+		imageNew[i].Width = img[i].Width
+		imageNew[i].Height = img[i].Height
+		imageNew[i].Link = img[i].Link
+	}
+
+	return imageNew, err
 }
 
 func (r RepositoryImages) FindImageId(s int) (user_cases.Image, error) {
-	i := user_cases.Image{}
+
+	img := r.db.FindImageId(s)
+	i := user_cases.Image{
+		Width:  img.Width,
+		Height: img.Height,
+		Link:   img.Link,
+	}
 	return i, nil
 }
 
-func (r RepositoryImages) ChangeImageId(s int) (user_cases.Image, error) {
-	i := user_cases.Image{}
-	return i, nil
+func (r RepositoryImages) ChangeImageId(image user_cases.Image) (user_cases.Image, error) {
+
+	imgDb := ImageDb{
+		Id:     image.Id,
+		Width:  image.Width,
+		Height: image.Height,
+		Link:   image.Link,
+	}
+	imgUpdate := ImageDb{}
+
+	var err error
+	_, err = r.db.ChangeImageId(imgDb)
+	imgUpdate = r.db.FindImageId(image.Id)
+	imguser := user_cases.Image{
+		Id:   imgUpdate.Id,
+		Link: imgUpdate.Link,
+	}
+	return imguser, err
 }
 
-func (r RepositoryImages) SaveImage(image user_cases.Image) error {
+func (r RepositoryImages) SaveImage(image user_cases.Image) (user_cases.Image, error) {
 
-	img := Image{}
-	namefile, _ := randomfilename16char()
-	f, err := os.Create("image" + namefile + ".png")
-	if err != nil {
-		log.Println(err)
+	imgDb := ImageDb{
+		Width:  image.Width,
+		Height: image.Height,
+		Link:   image.Link,
 	}
-	fileurl := "C:\\Users\\user\\go\\src\\projectServis\\repository\\" + f.Name()
-	img.Link = fileurl
-	err = r.db.SaveImage(img)
-	if err != nil {
-		log.Println(err)
+	imgId := ImageDb{}
+	imguser := user_cases.Image{}
+	var err error
+	if image.Link != "" && image.Height != 0 && image.Width != 0 {
+		imgId, err = r.db.SaveImage(imgDb)
+		imguser = user_cases.Image{
+			Id:     imgId.Id,
+			Width:  imgId.Width,
+			Height: imgId.Height,
+			Link:   imgId.Link,
+		}
 	}
-	return err
+	//else {
+	//	errors.New("not correct data")
+	//}
+
+	return imguser, err
 }
 
-func randomfilename16char() (s string, err error) {
-	b := make([]byte, 8)
-	_, err = rand.Read(b)
-	if err != nil {
-		return
-	}
-	return s, err
-}
-
-type Dbmager interface {
-	HistoryAll() ([]Image, error)
-	FindImageId(id int) Image
-	ChangeImageId(id int)
-	SaveImage(image Image) error
+type DbImager interface {
+	HistoryAll() ([]ImageDb, error)
+	FindImageId(id int) ImageDb
+	ChangeImageId(ImageDb) (ImageDb, error)
+	SaveImage(ImageDb) (ImageDb, error)
 }
