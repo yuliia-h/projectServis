@@ -47,9 +47,7 @@ func (h Handlers) HandleResizeImage(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Println(err)
 	}
-
 	i := user_cases.Image(image)
-
 	//формируем ответ передаем в метод структуру и возвращаем ошибку
 	ans, err := h.imgService.Resize(i)
 	if err != nil {

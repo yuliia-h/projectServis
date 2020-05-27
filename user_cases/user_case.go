@@ -1,7 +1,7 @@
 package user_cases
 
 import (
-	"log"
+	"errors"
 	"math/rand"
 	"time"
 )
@@ -55,9 +55,11 @@ type Servicer interface {
 
 func (s Service) Resize(image Image) (Image, error) {
 
+	if image.Buffer == "" || image.Height == 0 || image.Width == 0 {
+		return Image{}, errors.New("not correct data")
+	}
 	resizedImg, err := s.library.ResizeImageLibrary(image)
 	if err != nil {
-		log.Println(err)
 	}
 	resizedImg.Link = String(30)
 

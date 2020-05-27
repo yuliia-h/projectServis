@@ -50,7 +50,6 @@ func (r RepositoryImages) FindImageId(s int) (user_cases.Image, error) {
 
 	img := r.db.FindImageId(s)
 	i := user_cases.Image{
-		Id:     img.Id,
 		Width:  img.Width,
 		Height: img.Height,
 		Link:   img.Link,
@@ -97,6 +96,9 @@ func (r RepositoryImages) SaveImage(image user_cases.Image) (user_cases.Image, e
 			Link:   imgId.Link,
 		}
 	}
+	//else {
+	//	errors.New("not correct data")
+	//}
 
 	return imguser, err
 }

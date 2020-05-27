@@ -44,11 +44,11 @@ func (r DbimageConnect) HistoryAll() ([]interfaces.ImageDb, error) {
 
 func (r DbimageConnect) FindImageId(id int) interfaces.ImageDb {
 
-	temp := interfaces.ImageDb{}
+	imageInfo := interfaces.ImageDb{}
 	row := r.dbimage.QueryRow("select * from images where id = $1", id)
-	_ = row.Scan(&temp.Id, &temp.Width, &temp.Height, &temp.Link)
+	_ = row.Scan(&imageInfo.Id, &imageInfo.Width, &imageInfo.Height, &imageInfo.Link)
 
-	return temp
+	return imageInfo
 }
 
 type Result struct {
@@ -61,6 +61,8 @@ func (r DbimageConnect) ChangeImageId(image interfaces.ImageDb) (interfaces.Imag
 	//var result Result
 
 	r.dbimage.Exec("UPDATE images SET link=$1 where id=$2 returning link", image.Link, image.Id)
+	r.dbimage.Exec("UPDATE images SET width=$1 where id=$2 ", image.Width, image.Id)
+	r.dbimage.Exec("UPDATE images SET height=$1 where id=$2 ", image.Height, image.Id)
 
 	//var  err error
 	//var width int

@@ -44,7 +44,6 @@ func (l LibraryImages) ResizeImageLibrary(image user_cases.Image) (user_cases.Im
 	//Декодируем base64 в байты
 	outPngData, err := l.DecodeString(image.Buffer)
 	if err != nil {
-
 		return user_cases.Image{}, err
 	}
 
