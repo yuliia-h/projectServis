@@ -7,11 +7,11 @@ import (
 )
 
 type Image struct {
-	Id     int
-	Width  int
-	Height int
-	Buffer string
-	Link   string
+	Id     int    `json:"id,omitempty"`
+	Width  int    `json:"width,omitempty"`
+	Height int    `json:"height,omitempty"`
+	Buffer string `json:"buffer,omitempty"`
+	Link   string `json:"link,omitempty"`
 }
 
 //random numbers
@@ -50,7 +50,7 @@ type Servicer interface {
 	Resize(image Image) (Image, error)
 	History() ([]Image, error)
 	GetDataById(id int) (Image, error)
-	UpdateDataById(id int) (Image, error)
+	UpdateDataById(Image) (Image, error)
 }
 
 func (s Service) Resize(image Image) (Image, error) {
@@ -78,8 +78,9 @@ func (s Service) GetDataById(id int) (Image, error) {
 	return s.repository.FindImageId(id)
 }
 
-func (s Service) UpdateDataById(id int) (Image, error) {
-	return s.repository.ChangeImageId(id)
+func (s Service) UpdateDataById(image Image) (Image, error) {
+	image.Link = String(30)
+	return s.repository.ChangeImageId(image)
 }
 
 type LibraryImager interface {
@@ -89,6 +90,6 @@ type LibraryImager interface {
 type RepositoryImager interface {
 	HistoryImages() ([]Image, error)
 	FindImageId(id int) (Image, error)
-	ChangeImageId(id int) (Image, error)
+	ChangeImageId(Image) (Image, error)
 	SaveImage(image Image) (Image, error)
 }

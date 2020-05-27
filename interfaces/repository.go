@@ -48,13 +48,34 @@ func (r RepositoryImages) HistoryImages() ([]user_cases.Image, error) {
 
 func (r RepositoryImages) FindImageId(s int) (user_cases.Image, error) {
 
-	i := user_cases.Image{}
+	img := r.db.FindImageId(s)
+	i := user_cases.Image{
+		Id:     img.Id,
+		Width:  img.Width,
+		Height: img.Height,
+		Link:   img.Link,
+	}
 	return i, nil
 }
 
-func (r RepositoryImages) ChangeImageId(s int) (user_cases.Image, error) {
-	i := user_cases.Image{}
-	return i, nil
+func (r RepositoryImages) ChangeImageId(image user_cases.Image) (user_cases.Image, error) {
+
+	imgDb := ImageDb{
+		Id:     image.Id,
+		Width:  image.Width,
+		Height: image.Height,
+		Link:   image.Link,
+	}
+	imgUpdate := ImageDb{}
+
+	var err error
+	_, err = r.db.ChangeImageId(imgDb)
+	imgUpdate = r.db.FindImageId(image.Id)
+	imguser := user_cases.Image{
+		Id:   imgUpdate.Id,
+		Link: imgUpdate.Link,
+	}
+	return imguser, err
 }
 
 func (r RepositoryImages) SaveImage(image user_cases.Image) (user_cases.Image, error) {
@@ -64,11 +85,10 @@ func (r RepositoryImages) SaveImage(image user_cases.Image) (user_cases.Image, e
 		Height: image.Height,
 		Link:   image.Link,
 	}
-
 	imgId := ImageDb{}
 	imguser := user_cases.Image{}
 	var err error
-	if image.Link != "" || image.Height != 0 || image.Width != 0 {
+	if image.Link != "" && image.Height != 0 && image.Width != 0 {
 		imgId, err = r.db.SaveImage(imgDb)
 		imguser = user_cases.Image{
 			Id:     imgId.Id,
@@ -84,6 +104,6 @@ func (r RepositoryImages) SaveImage(image user_cases.Image) (user_cases.Image, e
 type DbImager interface {
 	HistoryAll() ([]ImageDb, error)
 	FindImageId(id int) ImageDb
-	ChangeImageId(id int)
+	ChangeImageId(ImageDb) (ImageDb, error)
 	SaveImage(ImageDb) (ImageDb, error)
 }

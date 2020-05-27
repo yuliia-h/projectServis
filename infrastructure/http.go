@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"projectServis/user_cases"
+	"strconv"
 )
 
 //интерфейсный тип
@@ -21,7 +22,7 @@ func NewHandlers(service user_cases.Servicer) *Handlers {
 }
 
 type Image struct {
-	Id     int    `json:"id"`
+	Id     int    `json:"id,omitempty"`
 	Width  int    `json:"width"`
 	Height int    `json:"height"`
 	Buffer string `json:"buffer"`
@@ -83,11 +84,6 @@ func (h Handlers) HandleHistoryImages(w http.ResponseWriter, r *http.Request) {
 		}
 		return
 	}
-	//var  b bytes.Buffer
-	//err = json.NewEncoder(&b).Encode(ans)
-	//if err != nil{
-	//	log.Println(err)
-	//}
 
 	b, err := json.Marshal(ans)
 	if err != nil {
@@ -98,54 +94,71 @@ func (h Handlers) HandleHistoryImages(w http.ResponseWriter, r *http.Request) {
 
 // данные картинки по id
 func (h Handlers) HandleGetImageById(w http.ResponseWriter, r *http.Request) {
-	//считываем весь реквест в body
-	//body, err := ioutil.ReadAll(r.Body)
-	//defer r.Body.Close()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	////формируем ответ передаем в метод структуру и возвращаем ошибку
-	//err = h.imgService.GetDataById( )
-	//if err != nil {
-	//	w.WriteHeader(http.StatusBadRequest)
-	//	_, err := w.Write([]byte(err.Error()))
-	//	if err != nil {
-	//		log.Println(err)
-	//	}
-	//	return
-	//}
-	//// отправляем статус 200
-	////сделать: завернуть картинку и отправить...
-	//w.WriteHeader(http.StatusOK)
+
+	id := r.URL.Query().Get("id")
+	s, err := strconv.Atoi(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+	//формируем ответ передаем в метод структуру и возвращаем ошибку
+	ans, err := h.imgService.GetDataById(s)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, err := w.Write([]byte(err.Error()))
+		if err != nil {
+			log.Println(err)
+		}
+		return
+	}
+	b, err := json.Marshal(ans)
+	if err != nil {
+		log.Println(err)
+	}
+	w.Write(b)
 }
 
 // изменить данные картинки по id
 func (h Handlers) HandleUpdateImageById(w http.ResponseWriter, r *http.Request) {
-	////считываем весь реквест в body
-	//body, err := ioutil.ReadAll(r.Body)
-	//defer r.Body.Close()
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	////создаем структуру
-	//image := &user_cases.Image{}
-	//
-	////парсим json в эту структуру
-	//err = json.Unmarshal(body, image)
-	//
-	////формируем ответ передаем в метод структуру и возвращаем ошибку
-	//err = h.imgService.UpdateDataById(image)
-	//if err != nil {
-	//	w.WriteHeader(http.StatusBadRequest)
-	//	_, err := w.Write([]byte(err.Error()))
-	//	if err != nil {
-	//		log.Println(err)
-	//	}
-	//	return
-	//}
-	//// отправляем статус 200
-	////сделать: завернуть картинку и отправить...
-	//w.WriteHeader(http.StatusOK)
+
+	id := r.URL.Query().Get("id")
+	s, err := strconv.Atoi(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//считываем весь реквест в body
+	body, err := ioutil.ReadAll(r.Body)
+	defer r.Body.Close()
+	if err != nil {
+		panic(err)
+	}
+
+	image := Image{}
+
+	//парсим json в эту структуру
+	err = json.Unmarshal(body, &image)
+
+	//создаем структуру
+	i := user_cases.Image{
+		Id:     s,
+		Width:  image.Width,
+		Height: image.Height,
+		Buffer: image.Buffer,
+		Link:   image.Link,
+	}
+	//формируем ответ передаем в метод структуру и возвращаем ошибку
+	ans, err := h.imgService.UpdateDataById(i)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		_, err := w.Write([]byte(err.Error()))
+		if err != nil {
+			log.Println(err)
+		}
+		return
+	}
+	b, err := json.Marshal(ans)
+	if err != nil {
+		log.Println(err)
+	}
+	w.Write(b)
 }

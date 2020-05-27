@@ -35,18 +35,6 @@ func (r DbimageConnect) HistoryAll() ([]interfaces.ImageDb, error) {
 
 	var images []interfaces.ImageDb
 	err := r.dbimage.Select(&images, "select * from images")
-
-	//images := []interfaces.ImageDb{}
-	//for rows.Next(){
-	//	p := interfaces.ImageDb{}
-	//	err := rows.Scan(&p.Id, &p.Width, &p.Height, &p.Link)
-	//	if err != nil{
-	//		fmt.Println(err)
-	//		continue
-	//	}
-	//	images = append(images, p)
-	//}
-
 	usercaseImages := make([]interfaces.ImageDb, 0, len(images))
 	for i := range images {
 		usercaseImages = append(usercaseImages, interfaces.ImageDb{Id: images[i].Id, Link: images[i].Link})
@@ -55,11 +43,47 @@ func (r DbimageConnect) HistoryAll() ([]interfaces.ImageDb, error) {
 }
 
 func (r DbimageConnect) FindImageId(id int) interfaces.ImageDb {
+
 	temp := interfaces.ImageDb{}
+	row := r.dbimage.QueryRow("select * from images where id = $1", id)
+	_ = row.Scan(&temp.Id, &temp.Width, &temp.Height, &temp.Link)
+
 	return temp
 }
 
-func (r DbimageConnect) ChangeImageId(id int) {
+type Result struct {
+	id, width, height int
+	link              string
+}
+
+func (r DbimageConnect) ChangeImageId(image interfaces.ImageDb) (interfaces.ImageDb, error) {
+
+	//var result Result
+
+	r.dbimage.Exec("UPDATE images SET link=$1 where id=$2 returning link", image.Link, image.Id)
+
+	//var  err error
+	//var width int
+	//var height int
+	//var link string
+	//
+	//	_, err = r.dbimage.Exec(`
+	//UPDATE images
+	//SET link=$1, width=$2, height=$3
+	//WHERE id=$2
+	//RETURNING link, width, height, id`,image.Link, image.Width, image.Height, image.Id)
+	//
+	imgUp := interfaces.ImageDb{}
+	//imgUp.Width = width
+	//
+	//row := r.dbimage.QueryRow("select * from images where id = $1 returning width, height, link", image.Id)
+	//_ = row.Scan(&imgUp.Id, &image.Width, &image.Height, &imgUp.Link)
+	//
+	//imgUp.Width = width
+	//imgUp.Height = height
+	//imgUp.Link = link
+
+	return imgUp, nil
 }
 
 func (r DbimageConnect) SaveImage(image interfaces.ImageDb) (interfaces.ImageDb, error) {

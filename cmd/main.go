@@ -47,10 +47,10 @@ func main() {
 	http.HandleFunc("/historyimages/", handlers.HandleHistoryImages)
 
 	// данные картинки по id
-	http.HandleFunc("/getimage/{id}/", handlers.HandleGetImageById)
+	http.HandleFunc("/getimage/id", handlers.HandleGetImageById)
 
 	// изменить данные картинки по id
-	http.HandleFunc("/updateimage/{id}/", handlers.HandleUpdateImageById)
+	http.HandleFunc("/updateimage/id", handlers.HandleUpdateImageById)
 
 	fmt.Println("Server is listening...")
 	http.ListenAndServe(":45998", nil)
