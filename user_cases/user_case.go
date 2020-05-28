@@ -1,8 +1,11 @@
 package user_cases
 
 import (
+	"encoding/base64"
 	"errors"
+	"io/ioutil"
 	"math/rand"
+	"os"
 	"time"
 )
 
@@ -53,6 +56,8 @@ type Servicer interface {
 	UpdateDataById(Image) (Image, error)
 }
 
+const path_to_file = "C:\\Users\\user\\go\\src\\projectServis\\images"
+
 func (s Service) Resize(image Image) (Image, error) {
 
 	if image.Buffer == "" || image.Height == 0 || image.Width == 0 {
@@ -61,14 +66,25 @@ func (s Service) Resize(image Image) (Image, error) {
 	resizedImg, err := s.library.ResizeImageLibrary(image)
 	if err != nil {
 	}
-	resizedImg.Link = String(30)
+
+	//f, err := os.Create("./images/outimage.png")
+	//if err != nil {}
+	//defer f.Close()
+
+	//Декодируем base64 в байты
+	outPngData, err := base64.StdEncoding.DecodeString(resizedImg.Buffer)
+	if err != nil {
+	}
+	fileName := String(10)
+	err = ioutil.WriteFile("./images/"+fileName+".png", outPngData, 0644)
+
+	resizedImg.Link = fileName
 
 	imgInfo, err := s.repository.SaveImage(resizedImg)
 	if err != nil {
 	}
 
 	imgInfo.Buffer = resizedImg.Buffer
-
 	return imgInfo, err
 }
 
@@ -81,7 +97,35 @@ func (s Service) GetDataById(id int) (Image, error) {
 }
 
 func (s Service) UpdateDataById(image Image) (Image, error) {
-	image.Link = String(30)
+
+	imageFindName, err := s.repository.FindImageId(image.Id)
+
+	files, err := ioutil.ReadDir(path_to_file)
+	if err != nil {
+	}
+
+	findName := imageFindName.Link + ".png"
+	for _, file := range files {
+		if file.Name() == findName {
+			err := os.Remove(path_to_file + "\\" + findName)
+			if err != nil {
+			}
+		}
+		//fmt.Println(file.Name(), file.IsDir())
+	}
+
+	//f, err := os.Create("./images/outimage.png")
+	//if err != nil {}
+	//defer f.Close()
+
+	//Декодируем base64 в байты
+	outPngData, err := base64.StdEncoding.DecodeString(image.Buffer)
+	if err != nil {
+	}
+	fileName := String(10)
+	err = ioutil.WriteFile("./images/"+fileName+".png", outPngData, 0644)
+	image.Link = fileName
+
 	return s.repository.ChangeImageId(image)
 }
 
